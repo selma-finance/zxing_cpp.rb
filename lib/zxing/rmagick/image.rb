@@ -1,7 +1,7 @@
 begin
   # Support both newer 'rmagick' require and deprecated 'RMagick' require:
   require 'rmagick'
-rescue LoadError => e
+rescue LoadError
   require 'RMagick'
 end
 
@@ -96,12 +96,29 @@ class ZXing::RMagick::Image
     raise ArgumentError, 'HTTP redirect too deep' if limit == 0
 
     require 'net/http'
+    require 'openssl'
 
-    response = Net::HTTP.get_response(uri)
+    http = Net::HTTP.new(uri.host, uri.port)
+
+    # Enable SSL/TLS for HTTPS URLs
+    if uri.scheme == 'https'
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      # Set up cert store without CRL checking (which causes issues with some sites)
+      http.cert_store = OpenSSL::X509::Store.new
+      http.cert_store.set_default_paths
+    end
+
+    request = Net::HTTP::Get.new(uri.request_uri)
+    response = http.request(request)
+
     case response
     when Net::HTTPSuccess; response
     when Net::HTTPRedirection
-      fetch(URI.parse(response['location']), limit-1)
+      location = response['location']
+      # Handle both absolute and relative redirects
+      redirect_uri = location.start_with?('http') ? URI.parse(location) : URI.join(uri, location)
+      fetch(redirect_uri, limit - 1)
     else
       response.error!
     end

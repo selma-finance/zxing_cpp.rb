@@ -1,7 +1,7 @@
 require File.expand_path( File.dirname(__FILE__) + '/../test_helper')
 require 'zxing/decodable'
 
-class DecodableTest < MiniTest::Test
+class DecodableTest < Minitest::Test
 
   class Object::File
     include Decodable
@@ -18,8 +18,10 @@ class DecodableTest < MiniTest::Test
   context "A Decodable module" do
     setup do
       @file = File.open( File.expand_path( File.dirname(__FILE__) + '/../qrcode.png' ))
-      @uri = URL.new "http://2d-code.co.uk/images/bbc-logo-in-qr-code.gif"
-      @bad_uri = URL.new "http://google.com"
+      # Using QR Server API to generate a QR code
+      @uri = URL.new "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://bbc.co.uk/programmes"
+      # Using a text file (not an image) which should raise BadImageException
+      @bad_uri = URL.new "https://www.google.com/robots.txt"
     end
 
     should "provide #decode to decode the return value of #path" do

@@ -1,3 +1,4 @@
+.github/FUNDING.yml
 .gitignore
 .gitmodules
 CHANGELOG.rdoc

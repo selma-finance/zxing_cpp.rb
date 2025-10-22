@@ -32,7 +32,7 @@ module ZXing
   def decode *args
     begin
       decode!(*args)
-    rescue Exception => e
+    rescue Exception
       nil
     end
   end

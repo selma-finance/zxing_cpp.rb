@@ -10,8 +10,8 @@ module ZXing::Common::HybridBinarizer
     end
   end
 
-  def initialize *args
-    super *args
+  def initialize(*args)
+    super(*args)
   end
 
 end

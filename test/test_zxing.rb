@@ -1,23 +1,25 @@
 require File.expand_path( File.dirname(__FILE__) + '/test_helper')
 require 'zxing'
 
-class ZXingTest < MiniTest::Test
+class ZXingTest < Minitest::Test
   context "A QR decoder singleton" do
 
     class Foo < Struct.new(:v); def to_s; self.v; end; end
 
     setup do
       @decoder = ZXing
-      @uri = "http://2d-code.co.uk/images/bbc-logo-in-qr-code.gif"
+      # Using QR Server API - generates QR code for "http://bbc.co.uk/programmes"
+      @uri = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://bbc.co.uk/programmes"
       @path = File.expand_path( File.dirname(__FILE__) + '/qrcode.png')
       @file = File.new(@path)
-      @google_logo = "http://www.google.com/logos/grandparentsday10.gif"
+      # Using Google logo as a non-QR image that should fail
+      @google_logo = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png"
       @uri_result = "http://bbc.co.uk/programmes"
       @path_result = "http://rubyflow.com"
     end
 
     should "decode a URL" do
-      assert_equal @decoder.decode(@uri), @uri_result
+      assert_equal @uri_result, @decoder.decode(@uri)
     end
 
     should "decode a file path" do
@@ -43,7 +45,7 @@ class ZXingTest < MiniTest::Test
   end
 
   context "A QR decoder module" do
-    
+
     setup do
       class SpyRing; include ZXing end
       @ring = SpyRing.new
